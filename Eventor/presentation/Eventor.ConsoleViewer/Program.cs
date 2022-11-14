@@ -1,16 +1,16 @@
-﻿using Eventually.Memory;
+﻿using Eventor.Memory;
 
-EventRepository eventRepository = new EventRepository();
+EventoRepository eventRepository = new EventoRepository();
 var evento = eventRepository.GetById(1L);
 
 
 Console.BackgroundColor = ConsoleColor.Green;
 Console.ForegroundColor = ConsoleColor.Black;
-Console.WriteLine("Eventually\n");
+Console.WriteLine("EVENTOR\n");
 Console.BackgroundColor = ConsoleColor.Black;
 Console.ForegroundColor = ConsoleColor.Green;
 Console.WriteLine(
-@$"Event name: {evento.Name}
+@$"Evento name: {evento.Name}
 Location: {evento.Location}
 Start Date: {evento.StartDate}, Time: {evento.StartTime}
 Finish Date: {evento.FinishDate}, Time: {evento.FinishTime})

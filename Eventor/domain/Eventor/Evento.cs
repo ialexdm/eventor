@@ -1,6 +1,6 @@
-﻿namespace Eventually
+﻿namespace Eventor
 {
-    public class Event
+    public class Evento
     {
         public long Id { get; set; }
         public string Name { get; set; }
@@ -14,7 +14,7 @@
         public LinkedList<Participate> Participates { get; set; }
         public LinkedList<Item> Items { get; set; }
 
-        public Event(
+        public Evento(
             long id,
             string name,
             string location,

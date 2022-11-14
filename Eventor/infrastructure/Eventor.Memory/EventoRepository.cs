@@ -1,13 +1,12 @@
-﻿using Eventually;
+﻿using Eventor;
 using System.Collections.Immutable;
 
-namespace Eventually.Memory
+namespace Eventor.Memory
 {
-    public class EventRepository
+    public class EventoRepository
     {
-        IEnumerable<Event> events;
-
-        public EventRepository()
+        IEnumerable<Evento> eventos; 
+        public EventoRepository()
         {
             LinkedList<Participate> participates = new LinkedList<Participate>();
             participates.AddFirst(new Participate(1L, "Vanya"));
@@ -21,7 +20,7 @@ namespace Eventually.Memory
             items.AddLast(new Item(4L, "Lighther"));
             items.AddLast(new Item(5L, "Food"));
 
-            Event evento = new Event(
+            Evento evento = new Evento(
                 1,
                 "Weekend Hiking with Team",
                 "Manaraga National Park",
@@ -33,14 +32,14 @@ namespace Eventually.Memory
                 participates,
                 items
                 );
-            events = new Event[]
+            eventos = new Evento[]
             {
                 evento
             };
         }
-        public Event GetById(long id)
+        public Evento GetById(long id)
             {
-                return events.Single(e => e.Id == id);
+                return eventos.Single(e => e.Id == id);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Eventually
+﻿namespace Eventor
 {
     public class Item
     {

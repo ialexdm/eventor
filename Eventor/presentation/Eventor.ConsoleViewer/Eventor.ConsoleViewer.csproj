@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Eventually.Memory\Eventually.Memory.csproj" />
-    <ProjectReference Include="..\Eventually\Eventually.csproj" />
+    <ProjectReference Include="..\..\domain\Eventor\Eventor.csproj" />
+    <ProjectReference Include="..\..\infrastructure\Eventor.Memory\Eventor.Memory.csproj" />
   </ItemGroup>
 
 </Project>
