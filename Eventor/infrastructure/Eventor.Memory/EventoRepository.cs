@@ -3,9 +3,9 @@ using System.Collections.Immutable;
 
 namespace Eventor.Memory
 {
-    public class EventoRepository
+    public class EventoRepository : IEventoRepository
     {
-        IEnumerable<Evento> eventos; 
+        LinkedList<Evento> eventos; 
         public EventoRepository()
         {
             LinkedList<Participate> participates = new LinkedList<Participate>();
@@ -32,11 +32,15 @@ namespace Eventor.Memory
                 participates,
                 items
                 );
-            eventos = new Evento[]
-            {
-                evento
-            };
+            eventos = new LinkedList<Evento>();
+            eventos.AddLast(evento);
         }
+
+        public void AddEvento(Evento evento)
+        {
+            eventos.AddLast(evento);
+        }
+
         public Evento GetById(long id)
             {
                 return eventos.Single(e => e.Id == id);
