@@ -2,6 +2,8 @@
 {
     public class Evento
     {
+        private static long count;
+        public static long Count { get { return count; } }
         public long Id { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
@@ -36,6 +38,7 @@
             Cost = cost;
             Participates = participates;
             Items = items;
+            count++;
         }
     }
 }
