@@ -4,10 +4,11 @@
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        private long count;
 
-        public Participate(long id, string name)
+        public Participate(string name)
         {
-            Id = id;
+            Id = ++count;
             Name = name;
         }
     }

@@ -3,42 +3,39 @@
     public class Evento
     {
         private static long count;
-        public static long Count { get { return count; } }
+        public static long Count { get; }
         public long Id { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly FinishDate { get; set; }
-
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly FinishTime { get; set; }
+        public DateOnly BeginDate { get; set; }
+        public TimeOnly BeginTime { get; set; }
+        public DateOnly EndDate { get; set; }
+        public TimeOnly EndTime { get; set; }
         public decimal Cost { get; set; }
-        public LinkedList<Participate> Participates { get; set; }
-        public LinkedList<Item> Items { get; set; }
+        public List<Participate> Participates { get; set; }
+        public List<Item> Items { get; set; }
 
         public Evento(
-            long id,
             string name,
             string location,
             DateOnly startDate,
+            TimeOnly startTime,
             DateOnly finishDate,
-            TimeOnly startTime, 
             TimeOnly finishTime,
             decimal cost,
-            LinkedList<Participate> participates,
-            LinkedList<Item> items)
+            List<Participate> participates,
+            List<Item> items)
         {
-            Id = id;
+            Id = ++count;
             Name = name;
             Location = location;
-            StartDate = startDate;
-            FinishDate = finishDate;
-            StartTime = startTime;
-            FinishTime = finishTime;
+            BeginDate = startDate;
+            BeginTime = startTime;
+            EndDate = finishDate;
+            EndTime = finishTime;
             Cost = cost;
             Participates = participates;
             Items = items;
-            count++;
         }
     }
 }

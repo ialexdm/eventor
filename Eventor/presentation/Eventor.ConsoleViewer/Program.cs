@@ -1,126 +1,199 @@
-﻿using Eventor;
+﻿
+using Eventor;
 using Eventor.Memory;
+bool shutdown = false;
 
-EventoRepository eventRepository = new EventoRepository();
-
-PrintAllEventos(eventRepository);
-Console.WriteLine();
-Console.WriteLine("If you want to create new evento press N.");
-var userInputKey = Console.ReadKey();
-if (userInputKey.Key == ConsoleKey.N)
+IEventoRepository eventoRepository = new EventoRepository();
+while(!shutdown)
 {
     Console.Clear();
-    string name = inputEventoData(nameof(name));
-    string location = inputEventoData(nameof(location));
-    DateTime startDate = InputDateTime(true);
-    DateTime finishDate = InputDateTime(false);
-    decimal cost = decimal.Parse(inputEventoData(nameof(cost)));
+    string userInput = ShowAllEventos(eventoRepository, out shutdown);
 
-    LinkedList<Participate> participates = new LinkedList<Participate>();
-    string inputParticipate;
+    if (int.TryParse(userInput, out var id))
+    {
+        var choosenEvento = eventoRepository.GetById(id);
+        Console.Clear();
+        ShowEvento(choosenEvento);
+        Console.ReadKey();
+    }
+    else if (userInput.ToLower().Trim() == "new")
+    {
+        Evento evento = CreateNewEvento(eventoRepository);
+        ShowEvento(evento);
+
+        Console.ReadKey();
+    }
+}
+
+
+static DateOnly InputDate()
+{
+    string inputYear;
+    int year;
     do
     {
-        Console.WriteLine("Enter name of participate, or enter \"end\"");
-        inputParticipate = Console.ReadLine();
-        if (string.IsNullOrEmpty(inputParticipate) || inputParticipate.Count() < 3)
+        Console.Write("YYYY:");
+        inputYear = Console.ReadLine() ?? "";
+
+    } while (inputYear.Count() != 4 || !int.TryParse(inputYear, out year));
+    string inputMonth;
+    int month;
+    do
+    {
+        Console.Write("MM:");
+        inputMonth = Console.ReadLine() ?? "";
+
+    } while (inputMonth.Count() != 2 || !int.TryParse(inputMonth, out month));
+    string inputDay;
+    int Day;
+    do
+    {
+        Console.Write("DD:");
+        inputDay = Console.ReadLine() ?? "";
+
+    } while (inputMonth.Count() != 2 || !int.TryParse(inputDay, out Day));
+    return new DateOnly(year, month, Day);
+}
+
+static TimeOnly InputTime()
+{
+    string inputHour;
+    int hour;
+    do
+    {
+        Console.Write("hh:");
+        inputHour = Console.ReadLine() ?? "";
+
+    } while (inputHour.Count() != 2 || !int.TryParse(inputHour, out hour));
+    string inputMinute;
+    int minute;
+    do
+    {
+        Console.Write("mm:");
+        inputMinute = Console.ReadLine() ?? "";
+
+    } while (inputMinute.Count() != 2 || !int.TryParse(inputMinute, out minute));
+    return new TimeOnly(hour, minute);
+}
+
+static string ShowAllEventos(IEventoRepository eventoRepository,out bool shutdown)//TODO separate method
+{
+    var eventos = eventoRepository.GetAll();
+
+    if (eventos != null)
+    {
+        foreach (var evento in eventos)
         {
-            Console.WriteLine("Participate name mast have 3 or more letters");
-            break;
+            Console.WriteLine($"#{evento.Id} {evento.Name} {evento.BeginDate}");
         }
-        participates.AddLast(new Participate(participates.Count + 1, inputParticipate));
-    } while (inputParticipate != "end");
-    LinkedList<Item> items = new LinkedList<Item>();
-    string inputItem;
+    }
+    Console.WriteLine("input evento id to choose evento," +
+        "'new' to create new evento and press enter" +
+        "'shutdown' to close app");
+    string userInput;
     do
     {
-        Console.WriteLine("Enter name of necessary item, or enter \"end\"");
+        userInput = Console.ReadLine();
+    } while (userInput == null);
+    shutdown = userInput.ToLower() == "shutdown";
+    return userInput;
+}
+
+static string InputName()
+{
+    Console.WriteLine("enter data and press enter.");
+    Console.Write("Name: ");
+    string name = Console.ReadLine() ?? "default evento";
+    return name;
+}
+
+static string InputLocation()
+{
+    Console.Write("Location: ");
+    string location = Console.ReadLine() ?? "uknown location";
+    return location;
+}
+
+static decimal InputCost()
+{
+    Console.Write("Cost: ");
+    decimal inputCost;
+    bool isDecimal = decimal.TryParse(Console.ReadLine(), out inputCost);
+    return inputCost;
+}
+
+static List<Participate> InputParticipates()
+{
+    Console.WriteLine("Participates: ");
+    Console.WriteLine("(press Enter to finish input)");
+    var participates = new List<Participate>();
+    bool isParticipate;
+    do
+    {
+        string inputParticipate = Console.ReadLine();
+        if (isParticipate = !string.IsNullOrEmpty(inputParticipate))
+        {
+            participates.Add(new Participate(inputParticipate));
+        }
+    } while (isParticipate);
+    return participates;
+}
+
+static List<Item> InputItems()
+{
+    Console.WriteLine("Items: ");
+    Console.WriteLine("(press Enter to finish input)");
+    var items = new List<Item>();
+    bool isItem;
+    do
+    {
+        string
         inputItem = Console.ReadLine();
-        if (string.IsNullOrEmpty(inputItem) || inputItem.Count() < 3)
+        if (isItem = !string.IsNullOrEmpty(inputItem))
         {
-            Console.WriteLine("necessary name mast have 3 or more letters");
-            break;
+            items.Add(new Item(inputItem));
         }
-        else
-        {
-            items.AddLast(new Item(items.Count + 1, inputItem));
-        }
-        
-    } while (inputItem != "end");
+    } while (isItem);
+    return items;
+}
 
-    Evento newEvento = new Evento(
-        Evento.Count +1,
-        name,
-        location,
-        DateOnly.FromDateTime(startDate),
-        DateOnly.FromDateTime(finishDate),
-        TimeOnly.FromDateTime(startDate),
-        TimeOnly.FromDateTime(finishDate),
-        cost,
-        participates,
-        items);
-    eventRepository.AddEvento(newEvento);
+static void ShowEvento(Evento choosenEvento)
+{
+    Console.WriteLine($"{choosenEvento.Id} {choosenEvento.Name}" +
+        $"\n{choosenEvento.Location}" +
+        $"\nbegin {choosenEvento.BeginDate} {choosenEvento.BeginTime}" +
+        $"\nend {choosenEvento.EndDate} {choosenEvento.EndTime}");
+    foreach (var participate in choosenEvento.Participates)
+    {
+        Console.WriteLine($"{participate.Id} {participate.Name}");
+    }
+    Console.WriteLine($"Total: {choosenEvento.Participates.Count}");
+    Console.WriteLine();
+    foreach (var item in choosenEvento.Items)
+    {
+        Console.WriteLine($"{item.Id} {item.Name}");
+    }
+    Console.WriteLine($"Cost: {choosenEvento.Cost}");
+
+}
+
+static Evento CreateNewEvento(IEventoRepository eventoRepository)
+{
     Console.Clear();
-    PrintAllEventos(eventRepository);
-}
-static string inputEventoData(string varName)
-{
-    string? result = null;
-    while (string.IsNullOrEmpty(result))
-    {
-        Console.Write($"Input Evento {varName}: ");
-        result = Console.ReadLine();
-        Console.WriteLine();
-    }
-    return result;
-}
+    var name = InputName();
+    var location = InputLocation();
+    Console.WriteLine("Begin: ");
+    DateOnly beginDate = InputDate();
+    TimeOnly beginTime = InputTime();
+    Console.WriteLine("End: ");
+    DateOnly endDate = InputDate();
+    TimeOnly endTime = InputTime();
+    var participates = InputParticipates();
+    var items = InputItems();
+    var cost = InputCost();
 
-Console.Read();
-
-static DateTime InputDateTime(bool isStartDateTime)
-{
-    string startOrFinish = isStartDateTime ? "start" : "finish";
-    int day = int.Parse(inputEventoData(startOrFinish + nameof(day)));
-    int month = int.Parse(inputEventoData(startOrFinish + nameof(month)));
-    int year = int.Parse(inputEventoData(startOrFinish + nameof(year)));
-    int hour = int.Parse(inputEventoData(startOrFinish + nameof(hour)));
-    int minute = int.Parse(inputEventoData(startOrFinish + nameof(minute)));
-
-    return new DateTime(day, month, year, hour, minute, 0); ;
-}
-
-static void PrintEvento(Evento evento)
-{
-    Console.BackgroundColor = ConsoleColor.Green;
-    Console.ForegroundColor = ConsoleColor.Black;
-    Console.WriteLine("EVENTOR\n");
-    Console.BackgroundColor = ConsoleColor.Black;
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine(
-    @$"Evento name: {evento.Name}
-Location: {evento.Location}
-Start Date: {evento.StartDate}, Time: {evento.StartTime}
-Finish Date: {evento.FinishDate}, Time: {evento.FinishTime})
-Cost: {evento.Cost}
-");
-    Console.WriteLine("Necessary items:");
-    foreach (var item in evento.Items)
-    {
-        Console.WriteLine(item.Name);
-    }
-    Console.WriteLine($"\nParticipates({evento.Participates.Count}):");
-    foreach (var participate in evento.Participates)
-    {
-        Console.WriteLine(participate.Name);
-    }
-}
-
-static void PrintAllEventos(EventoRepository eventRepository)
-{
-    long count = Evento.Count;
-    while (count > 0)
-    {
-        var evento = eventRepository.GetById(count);
-        PrintEvento(evento);
-        count--;
-    }
+    var evento = new Evento(name, location, beginDate, beginTime, endDate, endTime, cost, participates, items);
+    eventoRepository.AddEvento(evento);
+    Console.Clear();
+    return evento;
 }
