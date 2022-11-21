@@ -10,5 +10,6 @@ namespace Eventor
     {
         Evento GetById(long id);
         void AddEvento(Evento evento);
+        Evento[]? GetAll();
     }
 }
