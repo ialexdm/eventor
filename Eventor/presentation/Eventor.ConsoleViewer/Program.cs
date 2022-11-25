@@ -38,57 +38,8 @@ while (!shutdown)
 }
 
 
-static DateOnly InputDate()
-{
-    string inputYear;
-    int year;
-    do
-    {
-        Console.Write("YYYY:");
-        inputYear = Console.ReadLine() ?? "";
 
-    } while (inputYear.Count() != 4 || !int.TryParse(inputYear, out year));
-    string inputMonth;
-    int month;
-    do
-    {
-        Console.Write("MM:");
-        inputMonth = Console.ReadLine() ?? "";
-
-    } while (inputMonth.Count() != 2 || !int.TryParse(inputMonth, out month));
-    string inputDay;
-    int Day;
-    do
-    {
-        Console.Write("DD:");
-        inputDay = Console.ReadLine() ?? "";
-
-    } while (inputMonth.Count() != 2 || !int.TryParse(inputDay, out Day));
-    return new DateOnly(year, month, Day);
-}
-
-static TimeOnly InputTime()
-{
-    string inputHour;
-    int hour;
-    do
-    {
-        Console.Write("hh:");
-        inputHour = Console.ReadLine() ?? "";
-
-    } while (inputHour.Count() != 2 || !int.TryParse(inputHour, out hour));
-    string inputMinute;
-    int minute;
-    do
-    {
-        Console.Write("mm:");
-        inputMinute = Console.ReadLine() ?? "";
-
-    } while (inputMinute.Count() != 2 || !int.TryParse(inputMinute, out minute));
-    return new TimeOnly(hour, minute);
-}
-
-static void ShowAllEventos()//TODO separate method
+static void ShowAllEventos()
 {
     var eventos = EventoService.AllEventos();
 
@@ -114,6 +65,28 @@ static string InputEventoIdOrNew(out bool shutdown)
     shutdown = userInput == "shutdown";
     return userInput;
 }
+
+static void ShowEvento(Evento choosenEvento)
+{
+    Console.WriteLine($"{choosenEvento.Id} {choosenEvento.Name}" +
+        $"\n{choosenEvento.Location}" +
+        $"\nbegin {choosenEvento.BeginDate} {choosenEvento.BeginTime}" +
+        $"\nend {choosenEvento.EndDate} {choosenEvento.EndTime}");
+    foreach (var participate in choosenEvento.Participates)
+    {
+        Console.WriteLine($"{participate.Id} {participate.Name}");
+    }
+    Console.WriteLine($"Total: {choosenEvento.Participates.Count}");
+    Console.WriteLine();
+    foreach (var item in choosenEvento.Items)
+    {
+        Console.WriteLine($"{item.Id} {item.Name}");
+    }
+    Console.WriteLine($"Cost: {choosenEvento.Cost}");
+
+}
+
+#region Input Evento Fields
 
 static string InputName()
 {
@@ -173,25 +146,57 @@ static List<Item> InputItems()
     return items;
 }
 
-static void ShowEvento(Evento choosenEvento)
+static DateOnly InputDate()
 {
-    Console.WriteLine($"{choosenEvento.Id} {choosenEvento.Name}" +
-        $"\n{choosenEvento.Location}" +
-        $"\nbegin {choosenEvento.BeginDate} {choosenEvento.BeginTime}" +
-        $"\nend {choosenEvento.EndDate} {choosenEvento.EndTime}");
-    foreach (var participate in choosenEvento.Participates)
+    string inputYear;
+    int year;
+    do
     {
-        Console.WriteLine($"{participate.Id} {participate.Name}");
-    }
-    Console.WriteLine($"Total: {choosenEvento.Participates.Count}");
-    Console.WriteLine();
-    foreach (var item in choosenEvento.Items)
-    {
-        Console.WriteLine($"{item.Id} {item.Name}");
-    }
-    Console.WriteLine($"Cost: {choosenEvento.Cost}");
+        Console.Write("YYYY:");
+        inputYear = Console.ReadLine() ?? "";
 
+    } while (inputYear.Count() != 4 || !int.TryParse(inputYear, out year));
+    string inputMonth;
+    int month;
+    do
+    {
+        Console.Write("MM:");
+        inputMonth = Console.ReadLine() ?? "";
+
+    } while (inputMonth.Count() != 2 || !int.TryParse(inputMonth, out month));
+    string inputDay;
+    int Day;
+    do
+    {
+        Console.Write("DD:");
+        inputDay = Console.ReadLine() ?? "";
+
+    } while (inputMonth.Count() != 2 || !int.TryParse(inputDay, out Day));
+    return new DateOnly(year, month, Day);
 }
+
+static TimeOnly InputTime()
+{
+    string inputHour;
+    int hour;
+    do
+    {
+        Console.Write("hh:");
+        inputHour = Console.ReadLine() ?? "";
+
+    } while (inputHour.Count() != 2 || !int.TryParse(inputHour, out hour));
+    string inputMinute;
+    int minute;
+    do
+    {
+        Console.Write("mm:");
+        inputMinute = Console.ReadLine() ?? "";
+
+    } while (inputMinute.Count() != 2 || !int.TryParse(inputMinute, out minute));
+    return new TimeOnly(hour, minute);
+}
+
+#endregion
 
 static void New()
 {
