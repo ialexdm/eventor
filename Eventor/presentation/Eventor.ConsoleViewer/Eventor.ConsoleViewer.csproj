@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\domain\Eventor\Eventor.csproj" />
+    <ProjectReference Include="..\..\Eventor.Services\Eventor.Services.csproj" />
     <ProjectReference Include="..\..\infrastructure\Eventor.Memory\Eventor.Memory.csproj" />
   </ItemGroup>
 

@@ -1,27 +1,39 @@
 ﻿
 using Eventor;
 using Eventor.Memory;
-bool shutdown = false;
+using Eventor.Services;
 
-IEventoRepository eventoRepository = new EventoRepository();
-while(!shutdown)
+
+EventoService.EventoRepository
+  = new EventoRepository();
+bool shutdown = false;
+while (!shutdown)
 {
     Console.Clear();
-    string userInput = ShowAllEventos(eventoRepository, out shutdown);
+    ShowAllEventos();
 
-    if (int.TryParse(userInput, out var id))
+    string userInput = InputEventoIdOrNew(out shutdown);
+    if (!shutdown)
     {
-        var choosenEvento = eventoRepository.GetById(id);
-        Console.Clear();
-        ShowEvento(choosenEvento);
-        Console.ReadKey();
-    }
-    else if (userInput.ToLower().Trim() == "new")
-    {
-        Evento evento = CreateNewEvento(eventoRepository);
-        ShowEvento(evento);
-
-        Console.ReadKey();
+        if (userInput == "new")
+        {
+            New();
+        }
+        else
+        {
+            Console.Clear();
+            try
+            {
+                var choosenEvento = EventoService.GetSingle(userInput);
+                ShowEvento(choosenEvento);
+            }
+            catch(InvalidOperationException e)
+            {
+                Console.WriteLine("Evento not found.\nPress 'ENTER' to continue...");
+            }
+            
+            Console.ReadKey();
+        }
     }
 }
 
@@ -76,9 +88,9 @@ static TimeOnly InputTime()
     return new TimeOnly(hour, minute);
 }
 
-static string ShowAllEventos(IEventoRepository eventoRepository,out bool shutdown)//TODO separate method
+static void ShowAllEventos()//TODO separate method
 {
-    var eventos = eventoRepository.GetAll();
+    var eventos = EventoService.AllEventos();
 
     if (eventos != null)
     {
@@ -87,15 +99,19 @@ static string ShowAllEventos(IEventoRepository eventoRepository,out bool shutdow
             Console.WriteLine($"#{evento.Id} {evento.Name} {evento.BeginDate}");
         }
     }
-    Console.WriteLine("input evento id to choose evento," +
-        "'new' to create new evento and press enter" +
-        "'shutdown' to close app");
+}
+static string InputEventoIdOrNew(out bool shutdown)
+{
+    Console.Write("input evento id or name to choose evento,\n" +
+    "'new' to create new evento,\n" +
+    "'shutdown' to close app,\n" +
+    "and press 'ENTER' to continue...");
     string userInput;
     do
     {
-        userInput = Console.ReadLine();
+        userInput = Console.ReadLine().ToLower().Trim();
     } while (userInput == null);
-    shutdown = userInput.ToLower() == "shutdown";
+    shutdown = userInput == "shutdown";
     return userInput;
 }
 
@@ -177,7 +193,7 @@ static void ShowEvento(Evento choosenEvento)
 
 }
 
-static Evento CreateNewEvento(IEventoRepository eventoRepository)
+static void New()
 {
     Console.Clear();
     var name = InputName();
@@ -192,8 +208,7 @@ static Evento CreateNewEvento(IEventoRepository eventoRepository)
     var items = InputItems();
     var cost = InputCost();
 
-    var evento = new Evento(name, location, beginDate, beginTime, endDate, endTime, cost, participates, items);
-    eventoRepository.AddEvento(evento);
+    EventoService.CreateNewEvento(name, location, beginDate, beginTime, endDate, endTime, cost, participates, items);
     Console.Clear();
-    return evento;
+
 }

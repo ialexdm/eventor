@@ -16,23 +16,24 @@
         public List<Item> Items { get; set; }
 
         public Evento(
+            long id,
             string name,
             string location,
-            DateOnly startDate,
-            TimeOnly startTime,
-            DateOnly finishDate,
-            TimeOnly finishTime,
+            DateOnly beginDate,
+            TimeOnly beginTime,
+            DateOnly endDate,
+            TimeOnly endTime,
             decimal cost,
             List<Participate> participates,
             List<Item> items)
         {
-            Id = ++count;
+            Id = id;
             Name = name;
             Location = location;
-            BeginDate = startDate;
-            BeginTime = startTime;
-            EndDate = finishDate;
-            EndTime = finishTime;
+            BeginDate = beginDate;
+            BeginTime = beginTime;
+            EndDate = endDate;
+            EndTime = endTime;
             Cost = cost;
             Participates = participates;
             Items = items;

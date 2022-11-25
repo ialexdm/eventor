@@ -5,52 +5,66 @@ namespace Eventor.Memory
 {
     public class EventoRepository : IEventoRepository
     {
+        private static long Count { get; set; }
+
         LinkedList<Evento> eventos;
         public EventoRepository()
         {
+            eventos = new LinkedList<Evento>();
+
             List<Participate> participates = new List<Participate>();
             participates.Add(new Participate("Vanya"));
             participates.Add(new Participate("Petya"));
             participates.Add(new Participate("Anya"));
 
             List<Item> items = new List<Item>();
-            items.Add(new Item ("Tent"));
+            items.Add(new Item("Tent"));
             items.Add(new Item("Sleeping bag"));
             items.Add(new Item("Cookware"));
             items.Add(new Item("Lighther"));
             items.Add(new Item("Food"));
 
-            Evento evento = new Evento(
+            CreateEvento(
                 "Weekend Hiking with Team",
                 "Manaraga National Park",
-                startDate: new DateOnly(2023, 12, 02),
-                startTime: new TimeOnly(8, 00),
-                finishDate: new DateOnly(2023, 12, 03),
-                finishTime: new TimeOnly(18, 00),
+                beginDate: new DateOnly(2023, 12, 02),
+                beginTime: new TimeOnly(8, 00),
+                endDate: new DateOnly(2023, 12, 03),
+                endTime: new TimeOnly(18, 00),
                 3496m,
                 participates,
                 items
                 );
-            Evento evento1 = new Evento(
+            CreateEvento(
                 "Birthday party",
                 "Papa Johnes",
-                startDate: new DateOnly(2023, 12, 02),
-                startTime: new TimeOnly(8, 00),
-                finishDate: new DateOnly(2023, 12, 03),
-                finishTime: new TimeOnly(18, 00),
+                beginDate: new DateOnly(2023, 12, 02),
+                beginTime: new TimeOnly(8, 00),
+                endDate: new DateOnly(2023, 12, 03),
+                endTime: new TimeOnly(18, 00),
                 3496m,
                 participates,
                 items
                 );
-
-            eventos = new LinkedList<Evento>();
-            eventos.AddLast(evento);
-            eventos.AddLast(evento1);
         }
 
-        public void AddEvento(Evento evento)
+        public void CreateEvento(Evento evento)
         {
             eventos.AddLast(evento);
+        }
+
+        public void CreateEvento(string name, string location, DateOnly beginDate, TimeOnly beginTime, DateOnly endDate, TimeOnly endTime, decimal cost, List<Participate> participates, List<Item> items)
+        {
+            eventos.AddLast(new Evento(++Count,
+                name,
+                location,
+                beginDate,
+                beginTime,
+                endDate,
+                endTime,
+                cost,
+                participates,
+                items));
         }
 
         public Evento[]? GetAll()
@@ -61,6 +75,10 @@ namespace Eventor.Memory
         public Evento GetById(long id)
         {
             return eventos.Single(e => e.Id == id);
+        }
+        public Evento GetByName(string name)
+        {
+            return eventos.Single(e => e.Name.Trim().ToLower() == name);
         }
     }
 }
