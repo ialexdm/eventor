@@ -1,84 +1,47 @@
 ﻿
 using Eventor;
 using Eventor.Memory;
-bool shutdown = false;
+using Eventor.Services;
 
-IEventoRepository eventoRepository = new EventoRepository();
-while(!shutdown)
+
+EventoService.EventoRepository
+  = new EventoRepository();
+bool shutdown = false;
+while (!shutdown)
 {
     Console.Clear();
-    string userInput = ShowAllEventos(eventoRepository, out shutdown);
+    ShowAllEventos();
 
-    if (int.TryParse(userInput, out var id))
+    string userInput = InputEventoIdOrNew(out shutdown);
+    if (!shutdown)
     {
-        var choosenEvento = eventoRepository.GetById(id);
-        Console.Clear();
-        ShowEvento(choosenEvento);
-        Console.ReadKey();
+        if (userInput == "new")
+        {
+            New();
+        }
+        else
+        {
+            Console.Clear();
+            try
+            {
+                var choosenEvento = EventoService.GetSingle(userInput);
+                ShowEvento(choosenEvento);
+            }
+            catch(InvalidOperationException e)
+            {
+                Console.WriteLine("Evento not found.\nPress 'ENTER' to continue...");
+            }
+            
+            Console.ReadKey();
+        }
     }
-    else if (userInput.ToLower().Trim() == "new")
-    {
-        Evento evento = CreateNewEvento(eventoRepository);
-        ShowEvento(evento);
-
-        Console.ReadKey();
-    }
 }
 
 
-static DateOnly InputDate()
+
+static void ShowAllEventos()
 {
-    string inputYear;
-    int year;
-    do
-    {
-        Console.Write("YYYY:");
-        inputYear = Console.ReadLine() ?? "";
-
-    } while (inputYear.Count() != 4 || !int.TryParse(inputYear, out year));
-    string inputMonth;
-    int month;
-    do
-    {
-        Console.Write("MM:");
-        inputMonth = Console.ReadLine() ?? "";
-
-    } while (inputMonth.Count() != 2 || !int.TryParse(inputMonth, out month));
-    string inputDay;
-    int Day;
-    do
-    {
-        Console.Write("DD:");
-        inputDay = Console.ReadLine() ?? "";
-
-    } while (inputMonth.Count() != 2 || !int.TryParse(inputDay, out Day));
-    return new DateOnly(year, month, Day);
-}
-
-static TimeOnly InputTime()
-{
-    string inputHour;
-    int hour;
-    do
-    {
-        Console.Write("hh:");
-        inputHour = Console.ReadLine() ?? "";
-
-    } while (inputHour.Count() != 2 || !int.TryParse(inputHour, out hour));
-    string inputMinute;
-    int minute;
-    do
-    {
-        Console.Write("mm:");
-        inputMinute = Console.ReadLine() ?? "";
-
-    } while (inputMinute.Count() != 2 || !int.TryParse(inputMinute, out minute));
-    return new TimeOnly(hour, minute);
-}
-
-static string ShowAllEventos(IEventoRepository eventoRepository,out bool shutdown)//TODO separate method
-{
-    var eventos = eventoRepository.GetAll();
+    var eventos = EventoService.AllEventos();
 
     if (eventos != null)
     {
@@ -87,17 +50,43 @@ static string ShowAllEventos(IEventoRepository eventoRepository,out bool shutdow
             Console.WriteLine($"#{evento.Id} {evento.Name} {evento.BeginDate}");
         }
     }
-    Console.WriteLine("input evento id to choose evento," +
-        "'new' to create new evento and press enter" +
-        "'shutdown' to close app");
+}
+static string InputEventoIdOrNew(out bool shutdown)
+{
+    Console.Write("input evento id or name to choose evento,\n" +
+    "'new' to create new evento,\n" +
+    "'shutdown' to close app,\n" +
+    "and press 'ENTER' to continue...");
     string userInput;
     do
     {
-        userInput = Console.ReadLine();
+        userInput = Console.ReadLine().ToLower().Trim();
     } while (userInput == null);
-    shutdown = userInput.ToLower() == "shutdown";
+    shutdown = userInput == "shutdown";
     return userInput;
 }
+
+static void ShowEvento(Evento choosenEvento)
+{
+    Console.WriteLine($"{choosenEvento.Id} {choosenEvento.Name}" +
+        $"\n{choosenEvento.Location}" +
+        $"\nbegin {choosenEvento.BeginDate} {choosenEvento.BeginTime}" +
+        $"\nend {choosenEvento.EndDate} {choosenEvento.EndTime}");
+    foreach (var participate in choosenEvento.Participates)
+    {
+        Console.WriteLine($"{participate.Id} {participate.Name}");
+    }
+    Console.WriteLine($"Total: {choosenEvento.Participates.Count}");
+    Console.WriteLine();
+    foreach (var item in choosenEvento.Items)
+    {
+        Console.WriteLine($"{item.Id} {item.Name}");
+    }
+    Console.WriteLine($"Cost: {choosenEvento.Cost}");
+
+}
+
+#region Input Evento Fields
 
 static string InputName()
 {
@@ -157,27 +146,59 @@ static List<Item> InputItems()
     return items;
 }
 
-static void ShowEvento(Evento choosenEvento)
+static DateOnly InputDate()
 {
-    Console.WriteLine($"{choosenEvento.Id} {choosenEvento.Name}" +
-        $"\n{choosenEvento.Location}" +
-        $"\nbegin {choosenEvento.BeginDate} {choosenEvento.BeginTime}" +
-        $"\nend {choosenEvento.EndDate} {choosenEvento.EndTime}");
-    foreach (var participate in choosenEvento.Participates)
+    string inputYear;
+    int year;
+    do
     {
-        Console.WriteLine($"{participate.Id} {participate.Name}");
-    }
-    Console.WriteLine($"Total: {choosenEvento.Participates.Count}");
-    Console.WriteLine();
-    foreach (var item in choosenEvento.Items)
-    {
-        Console.WriteLine($"{item.Id} {item.Name}");
-    }
-    Console.WriteLine($"Cost: {choosenEvento.Cost}");
+        Console.Write("YYYY:");
+        inputYear = Console.ReadLine() ?? "";
 
+    } while (inputYear.Count() != 4 || !int.TryParse(inputYear, out year));
+    string inputMonth;
+    int month;
+    do
+    {
+        Console.Write("MM:");
+        inputMonth = Console.ReadLine() ?? "";
+
+    } while (inputMonth.Count() != 2 || !int.TryParse(inputMonth, out month));
+    string inputDay;
+    int Day;
+    do
+    {
+        Console.Write("DD:");
+        inputDay = Console.ReadLine() ?? "";
+
+    } while (inputMonth.Count() != 2 || !int.TryParse(inputDay, out Day));
+    return new DateOnly(year, month, Day);
 }
 
-static Evento CreateNewEvento(IEventoRepository eventoRepository)
+static TimeOnly InputTime()
+{
+    string inputHour;
+    int hour;
+    do
+    {
+        Console.Write("hh:");
+        inputHour = Console.ReadLine() ?? "";
+
+    } while (inputHour.Count() != 2 || !int.TryParse(inputHour, out hour));
+    string inputMinute;
+    int minute;
+    do
+    {
+        Console.Write("mm:");
+        inputMinute = Console.ReadLine() ?? "";
+
+    } while (inputMinute.Count() != 2 || !int.TryParse(inputMinute, out minute));
+    return new TimeOnly(hour, minute);
+}
+
+#endregion
+
+static void New()
 {
     Console.Clear();
     var name = InputName();
@@ -192,8 +213,7 @@ static Evento CreateNewEvento(IEventoRepository eventoRepository)
     var items = InputItems();
     var cost = InputCost();
 
-    var evento = new Evento(name, location, beginDate, beginTime, endDate, endTime, cost, participates, items);
-    eventoRepository.AddEvento(evento);
+    EventoService.CreateNewEvento(name, location, beginDate, beginTime, endDate, endTime, cost, participates, items);
     Console.Clear();
-    return evento;
+
 }
