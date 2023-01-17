@@ -3,12 +3,12 @@ using System.Collections.Immutable;
 
 namespace Eventor.Memory
 {
-    public class EventoRepository : IEventoRepository
+    public class EventoMemoryRepository : IEventoRepository
     {
         private static long Count { get; set; }
 
         LinkedList<Evento> eventos;
-        public EventoRepository()
+        public EventoMemoryRepository()
         {
             eventos = new LinkedList<Evento>();
 
