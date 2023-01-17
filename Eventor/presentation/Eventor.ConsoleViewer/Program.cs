@@ -5,7 +5,7 @@ using Eventor.Services;
 
 
 EventoService.EventoRepository
-  = new EventoRepository();
+  = new EventoMemoryRepository();
 bool shutdown = false;
 while (!shutdown)
 {
@@ -68,19 +68,19 @@ static string InputEventoIdOrNew(out bool shutdown)
 
 static void ShowEvento(Evento choosenEvento)
 {
-    Console.WriteLine($"{choosenEvento.Id} {choosenEvento.Name}" +
+    Console.WriteLine($"#{choosenEvento.Id} {choosenEvento.Name}" +
         $"\n{choosenEvento.Location}" +
         $"\nbegin {choosenEvento.BeginDate} {choosenEvento.BeginTime}" +
         $"\nend {choosenEvento.EndDate} {choosenEvento.EndTime}");
-    foreach (var participate in choosenEvento.Participates)
+    for (int i = 0; i < choosenEvento.Participates.Count(); i++)
     {
-        Console.WriteLine($"{participate.Id} {participate.Name}");
+        Console.WriteLine($"#{i+1} {choosenEvento.Participates[i].Name}");
     }
     Console.WriteLine($"Total: {choosenEvento.Participates.Count}");
     Console.WriteLine();
-    foreach (var item in choosenEvento.Items)
+    for (int i = 0; i< choosenEvento.Items.Count(); i++)
     {
-        Console.WriteLine($"{item.Id} {item.Name}");
+        Console.WriteLine($"#{i+1} {choosenEvento.Items[i].Name}");
     }
     Console.WriteLine($"Cost: {choosenEvento.Cost}");
 
